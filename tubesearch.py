@@ -2,7 +2,6 @@
 
 import http.client,ssl,json,argparse,datetime
 from pathlib import Path
-import os.path
 from os import path
 
 home = str(Path.home())
