@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-import http.client,ssl,json,argparse,datetime
+import http.client,ssl,json,argparse,datetime,sys
 from pathlib import Path
 from os import path
 
@@ -36,7 +36,7 @@ defintion='&videoDefinition='
 dimension='&videoDimension='
 duration='&videoDuration='
 
-if not (args.query or args.results or args.safe or args.user):
+if not len(sys.argv) > 1:
        print("An argument is required.")
        parser.print_usage()
        quit()
