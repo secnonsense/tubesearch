@@ -1,57 +1,65 @@
 #!/usr/local/bin/python3
 
 import http.client,ssl,json,argparse,datetime
+from pathlib import Path
+import os.path
+from os import path
+
+home = str(Path.home())
 
 plus=x=0
 
+if path.exists(home + "/.google_key"):
+	with open(home + '/.google_key', 'r') as reader:
+		key=reader.readline().strip('\n\r')
+else:
+	print("\nA Google API key must be created for this program to work and it needs to be stored in $HOME/.google_key\n")
+	quit()
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-q", "--query", help="Search Terms", action="store", dest="query")
-parser.add_argument("-l", "--language", help="language to search for", action="store", dest="language")
-parser.add_argument("-s", "--stars", help="minimum number of stars", action="store", dest="stars")
-parser.add_argument("-u", "--user", help="user name", action="store", dest="user")
-parser.add_argument("-p", "--pushed", help="Date (YYYY-MM-DD) last update was pushed", action="store", dest="pushed")
+parser.add_argument("-r", "--results", help="The number of items returned from 0 to 50", action="store", dest="results")
+parser.add_argument("-s", "--safesearch", help="Safesearch level, strict, none or moderate", action="store", dest="safe")
+parser.add_argument("-t", "--type", help="Type of content; video, playlist or channel", action="store", dest="type")
+parser.add_argument("-d", "--dimension", help="The dimension of the video; 2d or 3d", action="store", dest="dimension")
+parser.add_argument("-x", "--definition", help="Video quality; high or standard", action="store", dest="definition")
+parser.add_argument("-l", "--length", help="Length of the video; short, medium, long", action="store", dest="duration")
+parser.add_argument("-o", "--order", help="The order to sort by- date, rating, relevance, viewCount, title", action="store", dest="order")
 args = parser.parse_args()
 
-conn = http.client.HTTPSConnection('api.github.com', context=ssl._create_unverified_context())
-url='/search/repositories?q='
-starsurl='stars:>='
-language='language:'
-user='user:'
-push='pushed:>='
-endurl='&sort=stars&order=desc&per_page=100'
+conn = http.client.HTTPSConnection('www.googleapis.com', context=ssl._create_unverified_context())
+url='/youtube/v3/search?part=snippet&key=' + key
+safe='&safeSearch='
+results='&maxResults='
+content='&type='
+order='&order='
+defintion='&videoDefinition='
+dimension='&videoDimension='
+duration='&videoDuration='
 
-if not (args.query or args.language or args.stars or args.user):
-        print("An argument is required.")
-        parser.print_usage()
-        quit()
+if not (args.query or args.results or args.safe or args.user):
+       print("An argument is required.")
+       parser.print_usage()
+       quit()
 if args.query:
-	url = url + args.query
-	plus=1
-if args.language:
-	if plus:
-		url = url + "+"
-	url = url + language + args.language
-	plus=1
-if args.stars:
-	if plus:
-		url = url + "+"
-	url = url + starsurl + args.stars
-	plus=1
-if args.user:
-	if plus:
-		url = url + "+"
-	url = url + user + args.user
-	plus=1
-if args.pushed:
-	try:
-		datetime.datetime.strptime(args.pushed, '%Y-%m-%d')
-	except ValueError:	
-		raise ValueError("Invalid date format for last update.  Should be YYYY-MM-DD")
-	if plus:
-		url = url + "+"
-	url = url + push + args.pushed	
+	url = url + '&q=' + args.query
+if args.results:
+	url = url + results + args.results
+if args.safe:
+	url = url + safe + args.safe
+if args.type:
+	url = url + content + args.type
+if args.order:
+	url = url + order + args.order
+if args.definition:
+	url = url + defintion + args.definition
+if args.dimension:
+	url = url + dimension + args.dimension
+if args.duration:
+	url = url + duration + args.duration
+if args.definition or args.dimension or  args.duration:
+	url = url + content + 'video'
 
-url=url+endurl
 method = 'GET'
 headers = {"Accept": "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-powerpoint, application/vnd.ms-excel, application/msword, application/x-shockwave-flash, */*", "Accept-Language": "en-us", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MANM; rv:11.0) like Gecko", "Connection": "Keep-Alive"}
 
@@ -59,21 +67,30 @@ conn.request(method, url, None, headers)
 
 httpResponse = conn.getresponse()
 
-response_dict=json.loads(httpResponse.read())
+decoded=httpResponse.read().decode('utf-8')
 
-print ('Results of getgit query')
+response_dict=json.loads(decoded)
+
+if response_dict['error']:
+	print(decoded)
+	quit()
+
+print ('Results of tubesearch query')
 print ('----------------------------------')
 
 count=len(response_dict['items'])
 
 while x < len(response_dict['items']):
-        print ('Full Name: ' + response_dict['items'][x]['full_name'] + '  |  Created at: ' + response_dict['items'][x]['created_at'] + '  |  Last Updated: ' + response_dict['items'][x]['pushed_at'])
-        if response_dict['items'][x]['description']:
-            print ('Description: ' + response_dict['items'][x]['description'])
-        print ('Owner: ' + response_dict['items'][x]['owner']['login'] + '  |  Owner Type: ' + response_dict['items'][x]['owner']['type'] + '  |  Number of Stars: ' + str(response_dict['items'][x]['stargazers_count'])) 
-        print ('Html Url: ' + response_dict['items'][x]['html_url'])
-        if response_dict['items'][x]['language']:
-            print ('Language: ' + response_dict['items'][x]['language'] + '  |  Size: ' + str(response_dict['items'][x]['size']) + '  |  Open Issues Count: ' + str(response_dict['items'][x]['open_issues_count']))
-        print ('----------------------------------')
-        x=x+1
+		viddict=response_dict['items'][x]['id']
+		if 'videoId' in viddict:
+			print("Video Url: https://www.youtube.com/watch?v=" + str(viddict['videoId']))
+		if 'playlistId' in viddict:
+			print("Playlist Url: https://www.youtube.com/playlist?list=" + str(viddict['playlistId']))
+		if 'channelId' in viddict:
+			print("Channel Url: https://www.youtube.com/channel/" + str(viddict['channelId']))
+		snipdict=response_dict['items'][x]['snippet']
+		for k, v in snipdict.items():
+			print(k +': ', v)
+		print ('----------------------------------')
+		x=x+1
 print ('Total number of results: ' + str(count))
