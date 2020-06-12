@@ -70,7 +70,7 @@ decoded=httpResponse.read().decode('utf-8')
 
 response_dict=json.loads(decoded)
 
-if response_dict['error']:
+if 'error' in response_dict:
 	print(decoded)
 	quit()
 
