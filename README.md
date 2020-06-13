@@ -3,7 +3,7 @@ Python script using the YouTube Data List API to search through videos.  Require
 
 Create an API key at https://console.developers.google.com/apis 
 
-Then add it to a file in your home directory ($HOME) called .google_key.
+Then add it to a file in your home directory ($HOME) named .google_key.
 
 Arguments:
 
