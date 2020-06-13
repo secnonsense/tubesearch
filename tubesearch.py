@@ -14,7 +14,7 @@ def check_key():
 		print("\nA Google API key must be created for this program to work and it needs to be stored in $HOME/.google_key\n")
 		quit()
 
-def construct_url(key):
+def construct_url(key, query='blah'):
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-q", "--query", help="Search Terms", action="store", dest="query")
 	parser.add_argument("-r", "--results", help="The number of items returned from 0 to 50", action="store", dest="results")
@@ -35,12 +35,14 @@ def construct_url(key):
 	dimension='&videoDimension='
 	duration='&videoDuration='
 
-	if not len(sys.argv) > 1:
+	if not len(sys.argv) > 1 and query == "blah":
        		print("An argument is required.")
        		parser.print_usage()
        		quit()
 	if args.query:
 		url = url + '&q=' + args.query
+	if query != "blah":
+		url = url + '&q=' + query
 	if args.results:
 		url = url + results + args.results
 	if args.safe:
