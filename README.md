@@ -7,12 +7,35 @@ Then add it to a file in your home directory ($HOME) called .google_key.
 
 Arguments:
 
-  -h, --help                  Show this help message and exit  
-  -q QUERY, --query           Search terms separated by '+'.  example: -q pop+music.   
-  -r RESULTS, --results       The number of items returned from 0 to 50  
-  -s SAFE, --safesearch       Safesearch level, strict, none or moderate  
-  -t TYPE, --type TYPE        Type of content; video, playlist or channel  
-  -d DIMENSION, --dimension   The dimension of the video; 2d or 3d  
-  -x DEFINITION, --definition Video quality; high or standard  
-  -l DURATION, --length       Length of the video; short, medium, long  
-  -o ORDER, --order           The order to sort by- date, rating, relevance,viewCount, title  
+<table>
+<thead>
+<tr>
+<th>-h, --help</th>                  
+<th>Show this help message and exit</th> 
+<tr>
+<th>-q QUERY, --query QUERY</th>         
+<th>Search terms separated by '+'.  example: -q pop+music.</th>
+</tr>
+<th>-r RESULTS, --results RESULTS       
+<th>The number of items returned from 0 to 50 (default is 5)
+</tr>
+<th>-s SAFE, --safesearch SAFE     
+<th>Safesearch level, strict, none or moderate (default is none)
+</tr>
+<th>-t TYPE, --type TYPE        
+<th>Type of content; video, playlist or channel (default is any)
+</tr>
+<th>-d DIMENSION, --dimension DIMENSION 
+<th>The dimension of the video; 2d or 3d (default is either)
+</tr>
+<th>-x DEFINITION, --definition DEFINITION
+<th>Video quality; high or standard. (default is either)
+</tr>
+<th>-l DURATION, --length DURATION      
+<th>Length of the video; short, medium, long. (defaults is any)
+</tr>
+<th>-o ORDER, --order ORDER         
+<th>The order to sort by- date, rating, relevance, viewCount, title (default is relevance)
+</tr>
+</table>
+
