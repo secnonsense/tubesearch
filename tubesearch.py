@@ -8,7 +8,8 @@ def check_key():
 	home = str(Path.home())
 	if path.exists(home + "/.google_key"):
 		with open(home + '/.google_key', 'r') as reader:
-			key=reader.readline().strip('\n\r')
+                    key=reader.readline().strip('\n\r')
+                    return key
 	else:
 		print("\nA Google API key must be created for this program to work and it needs to be stored in $HOME/.google_key\n")
 		quit()
@@ -25,7 +26,6 @@ def construct_url(key):
 	parser.add_argument("-o", "--order", help="The order to sort by- date, rating, relevance, viewCount, title", action="store", dest="order")
 	args = parser.parse_args()
 
-	conn = http.client.HTTPSConnection('www.googleapis.com', context=ssl._create_unverified_context())
 	url='/youtube/v3/search?part=snippet&key=' + key
 	safe='&safeSearch='
 	results='&maxResults='
@@ -60,21 +60,23 @@ def construct_url(key):
 	return url
 
 def api_req(url):	
-	method = 'GET'
-	headers = {"Accept": "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-powerpoint, application/vnd.ms-excel, application/msword, application/x-shockwave-flash, */*", "Accept-Language": "en-us", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MANM; rv:11.0) like Gecko", "Connection": "Keep-Alive"}
+        method = 'GET'
+        headers = {"Accept": "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-powerpoint, application/vnd.ms-excel, application/msword, application/x-shockwave-flash, */*", "Accept-Language": "en-us", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MANM; rv:11.0) like Gecko", "Connection": "Keep-Alive"}
 
-	conn.request(method, url, None, headers)
+        conn = http.client.HTTPSConnection('www.googleapis.com', context=ssl._create_unverified_context())
+	
+        conn.request(method, url, None, headers)
 
-	httpResponse = conn.getresponse()
+        httpResponse = conn.getresponse()
 
-	decoded=httpResponse.read().decode('utf-8')
+        decoded=httpResponse.read().decode('utf-8')
 
-	response_dict=json.loads(decoded)
+        response_dict=json.loads(decoded)
 
-	if 'error' in response_dict:
-		print(decoded)
-		quit()
-	return response_dict
+        if 'error' in response_dict:
+                print(decoded)
+                quit()
+        return response_dict
 
 def print_results(response_dict):
 	x=0
@@ -98,8 +100,12 @@ def print_results(response_dict):
 		x=x+1
 	print ('Total number of results: ' + str(count))
 
-key=check_key()	
-url=construct_url(key)
-respond_dict=api_req(url)
-print_results(response_dict)
+def main():
+    key=check_key()	
+    url=construct_url(key)
+    response_dict=api_req(url)
+    print_results(response_dict)
+
+if __name__ == "__main__":
+    main()
 	
