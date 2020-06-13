@@ -8,7 +8,7 @@ Then add it to a file in your home directory ($HOME) called .google_key.
 Arguments:
 
   -h, --help                  Show this help message and exit  
-  -q QUERY, --query           Search Terms separated by '+'.  example: -q pop+music.   
+  -q QUERY, --query           Search terms separated by '+'.  example: -q pop+music.   
   -r RESULTS, --results       The number of items returned from 0 to 50  
   -s SAFE, --safesearch       Safesearch level, strict, none or moderate  
   -t TYPE, --type TYPE        Type of content; video, playlist or channel  
