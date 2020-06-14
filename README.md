@@ -5,7 +5,7 @@ Create an API key at https://console.developers.google.com/apis
 
 Then add it to a file in your home directory ($HOME) named .google_key.
 
-Arguments:
+**Arguments:**
 
 <table>
 <thead>
