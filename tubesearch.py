@@ -23,6 +23,7 @@ def construct_url(key, query='blah'):
 	parser.add_argument("-d", "--dimension", help="The dimension of the video; 2d or 3d", action="store", dest="dimension")
 	parser.add_argument("-x", "--definition", help="Video quality; high or standard", action="store", dest="definition")
 	parser.add_argument("-l", "--length", help="Length of the video; short, medium, long", action="store", dest="duration")
+	parser.add_argument("-a", "--after", help="Published after date, using format:1970-01-01", action="store", dest="after")
 	parser.add_argument("-o", "--order", help="The order to sort by- date, rating, relevance, viewCount, title", action="store", dest="order")
 	args = parser.parse_args()
 
@@ -34,6 +35,7 @@ def construct_url(key, query='blah'):
 	defintion='&videoDefinition='	
 	dimension='&videoDimension='
 	duration='&videoDuration='
+	after='&publishedAfter='
 
 	if not len(sys.argv) > 1 and query == "blah":
        		print("An argument is required.")
@@ -57,6 +59,12 @@ def construct_url(key, query='blah'):
 		url = url + dimension + args.dimension
 	if args.duration:
 		url = url + duration + args.duration
+	if args.after:
+		try:
+			datetime.datetime.strptime(args.after, '%Y-%m-%d')
+		except ValueError:	
+			raise ValueError("Invalid date format for last update.  Should be YYYY-MM-DD")
+		url = url + after + args.after + 'T00:00:00Z'
 	if args.definition or args.dimension or  args.duration:
 		url = url + content + 'video'
 	return url
