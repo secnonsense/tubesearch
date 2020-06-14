@@ -37,5 +37,8 @@ Arguments:
 <th>-o ORDER, --order ORDER         
 <th>The order to sort by- date, rating, relevance, viewCount, title (default is relevance)
 </tr>
+<th>-a DATE, --after DATE
+<th>Show content published after the listed date, using format:1970-01-01
+</tr>
 </table>
 
