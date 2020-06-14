@@ -14,7 +14,7 @@ def check_key():
 		print("\nA Google API key must be created for this program to work and it needs to be stored in $HOME/.google_key\n")
 		quit()
 
-def construct_url(key, query='blah'):
+def construct_url(key, query='blah', afterdate='blah'):
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-q", "--query", help="Search Terms", action="store", dest="query")
 	parser.add_argument("-r", "--results", help="The number of items returned from 0 to 50", action="store", dest="results")
@@ -37,7 +37,7 @@ def construct_url(key, query='blah'):
 	duration='&videoDuration='
 	after='&publishedAfter='
 
-	if not len(sys.argv) > 1 and query == "blah":
+	if not len(sys.argv) > 1 and query == "blah" and afterdate == "blah":
        		print("An argument is required.")
        		parser.print_usage()
        		quit()
@@ -65,6 +65,8 @@ def construct_url(key, query='blah'):
 		except ValueError:	
 			raise ValueError("Invalid date format for last update.  Should be YYYY-MM-DD")
 		url = url + after + args.after + 'T00:00:00Z'
+	if afterdate != "blah":
+		url = url + after + afterdate + 'T00:00:00Z'
 	if args.definition or args.dimension or  args.duration:
 		url = url + content + 'video'
 	return url
