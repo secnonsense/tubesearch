@@ -120,8 +120,11 @@ def print_results(response_dict):
 def print_results_web(response_dict):
 	x=0
 	count=len(response_dict['items'])
+    
+	directory = str(Path.home())
+	webfile = Path(directory, 'output.html')
 
-	file = open('/tmp/output.html', 'w')
+	file = open(webfile, 'w')
 	file.write("<!DOCTYPE html>\n")
 	file.write("<html>\n")
 	file.write("<body>\n")
@@ -149,7 +152,7 @@ def print_results_web(response_dict):
 	file.write("</body>\n")
 	file.write("</html>\n")
 	file.close()
-	webbrowser.open_new("file:///tmp/output.html")
+	webbrowser.open_new(webfile.absolute().as_uri())
 
 def main():
 	key=check_key()	
