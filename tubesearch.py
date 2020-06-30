@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-import http.client,ssl,json,argparse,datetime,sys
+import http.client,ssl,json,argparse,datetime,sys,webbrowser
 from pathlib import Path
 from os import path
 
@@ -25,6 +25,7 @@ def construct_url(key, query='blah', afterdate='blah'):
 	parser.add_argument("-l", "--length", help="Length of the video; short, medium, long", action="store", dest="duration")
 	parser.add_argument("-a", "--after", help="Published after date, using format:1970-01-01", action="store", dest="after")
 	parser.add_argument("-o", "--order", help="The order to sort by- date, rating, relevance, viewCount, title", action="store", dest="order")
+	parser.add_argument("-w", "--web", help="Choose to view results in web browser", action="store_true", default=False)
 	args = parser.parse_args()
 
 	url='/youtube/v3/search?part=snippet&key=' + key
@@ -69,7 +70,11 @@ def construct_url(key, query='blah', afterdate='blah'):
 		url = url + after + afterdate + 'T00:00:00Z'
 	if args.definition or args.dimension or  args.duration:
 		url = url + content + 'video'
-	return url
+	if args.web:
+		web = 1
+	else:
+		web = 0
+	return url,web
 
 def api_req(url):	
         method = 'GET'
@@ -112,11 +117,48 @@ def print_results(response_dict):
 		x=x+1
 	print ('Total number of results: ' + str(count))
 
+def print_results_web(response_dict):
+	x=0
+	count=len(response_dict['items'])
+
+	file = open('/tmp/output.html', 'w')
+	file.write("<!DOCTYPE html>\n")
+	file.write("<html>\n")
+	file.write("<body>\n")
+	file.write('<h1>Results of tubesearch query:</h1>\n')
+	file.write('<h2>----------------------------------</h2>\n')
+
+	while x < len(response_dict['items']):
+		snipdict=response_dict['items'][x]['snippet']
+		for k, v in snipdict.items():
+			#print("k: " + k)
+			if 'thumbnails' in k:
+				file.write("<img src=\"" + str(v['high']['url']) + "\" alt=\"thumbnail cant be displayed\" width=\"480\" height=\"360\" >\n")
+			if k in ('title','description','publishTime','channelTitle'):
+				file.write("<p>" + str(k) + ": " +  str(v) + "</p>\n")
+		viddict=response_dict['items'][x]['id']
+		if 'videoId' in viddict:
+			file.write("<a href='https://www.youtube.com/watch?v=" + str(viddict['videoId'] + "'>\nClick to Play Video</a>\n"))
+		if 'playlistId' in viddict:
+			file.write("<a href='https://www.youtube.com/playlist?list=" + str(viddict['playlistId'] + "'>\nClick to See Playlist</a>\n"))
+		if 'channelId' in viddict:
+			file.write("<a href='https://www.youtube.com/channel/" + str(viddict['channelId'] + "'>\nClick to See Channel</a>\n"))
+		file.write("<h2>----------------------------------</h2>\n")
+		x=x+1
+	file.write('<h4>Total number of results: ' + str(count)+ '</h4>')
+	file.write("</body>\n")
+	file.write("</html>\n")
+	file.close()
+	webbrowser.open_new("file:///tmp/output.html")
+
 def main():
-    key=check_key()	
-    url=construct_url(key)
-    response_dict=api_req(url)
-    print_results(response_dict)
+	key=check_key()	
+	url,web=construct_url(key)
+	response_dict=api_req(url)
+	if web:
+		print_results_web(response_dict)
+	else:
+		print_results(response_dict)
 
 if __name__ == "__main__":
     main()
